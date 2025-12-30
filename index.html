@@ -196,6 +196,43 @@
             opacity: 0.9;
         }
 
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .share-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .share-button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .share-button.twitter {
+            background-color: #1DA1F2;
+        }
+
+        .share-button.line {
+            background-color: #06C755;
+        }
+
+        .share-button i {
+            margin-right: 8px;
+        }
+
         .info-section {
             background: var(--bg-white);
             border-radius: 12px;
@@ -329,7 +366,7 @@
                 <h2>📝 今日の日記を書いてみましょう</h2>
                 <textarea 
                     id="diaryInput" 
-                    placeholder="今日あったことを、素直に書いてください。&#10;&#10;例：&#10;今日は会議でうまく話せなかった。資料も間に合わなくて焦ってしまった。でも同僚が助けてくれて、なんとか乗り切れた。&#10;&#10;※個人情報(名前、メールアドレスなど)は自動的にマスキングされます。"
+                    placeholder="今日あったことを、素直にみてください。&#10;&#10;例：&#10;今日は会議でうまく話せなかった。資料も間に合わなくて焦ってしまった。でも同僚が助けてくれて、なんとか乗り切れた。&#10;&#10;※個人情報(名前、メールアドレスなど)は自動的にマスキングされます。"
                 ></textarea>
                 <div class="char-count" id="charCount">0 / 500文字</div>
                 
@@ -342,6 +379,14 @@
                     <div class="result-label">✨ あなたへのメッセージ</div>
                     <div class="result-text" id="resultText"></div>
                     <button class="copy-button" onclick="copyResult()">📋 コピーする</button>
+                    <div class="share-buttons">
+                        <a href="#" class="share-button twitter" id="twitterShare">
+                            <i>🐦</i> Twitterで共有
+                        </a>
+                        <a href="#" class="share-button line" id="lineShare">
+                            <i>💬</i> LINEで共有
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -483,6 +528,21 @@
                 showToast('コピーに失敗しました');
             });
         }
+
+        // SNSシェア機能
+        document.getElementById('twitterShare').addEventListener('click', function(e) {
+            e.preventDefault();
+            const resultText = document.getElementById('resultText').textContent;
+            const text = encodeURIComponent('ポジ変換で前向きな言葉に変換しました！\n\n' + resultText + '\n\n#ポジ変換');
+            window.open('https://twitter.com/intent/tweet?text=' + text, '_blank', 'width=550,height=420');
+        });
+
+        document.getElementById('lineShare').addEventListener('click', function(e) {
+            e.preventDefault();
+            const resultText = document.getElementById('resultText').textContent;
+            const text = encodeURIComponent('ポジ変換で前向きな言葉に変換しました！\n\n' + resultText + '\n\n#ポジ変換');
+            window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(window.location.href) + '&text=' + text, '_blank', 'width=550,height=420');
+        });
 
         // トースト表示
         function showToast(message) {
