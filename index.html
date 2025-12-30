@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ポジ変換 - 日記を自己肯定の言葉に変えるアプリ">
+    <meta name="theme-color" content="#FFB84D">
+    <title>ポジ変換</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #FFB84D;
+            --secondary-color: #7BC896;
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-cream: #FFF9F0;
+            --bg-white: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            color: var(--text-dark);
+            line-height: 1.7;
+            background: var(--bg-cream);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--bg-white);
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        main {
+            padding: 30px 0;
+        }
+
+        .card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .char-count {
+            text-align: right;
+            color: var(--text-light);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-color), #FFA726);
+            color: white;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.secondary {
+            background: var(--bg-cream);
+            color: var(--text-dark);
+            border: 2px solid #E0E0E0;
+        }
+
+        .result-card {
+            display: none;
+            background: linear-gradient(135deg, #FFF9F0, #E5F8ED);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+            border-left: 4px solid var(--secondary-color);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .result-text {
+            font-size: 20px;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .copy-button {
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .copy-button:hover {
+            opacity: 0.9;
+        }
+
+        .info-section {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .info-section h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-section li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .info-section li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-dark);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 0.9;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            textarea {
+                min-height: 150px;
+            }
+
+            .result-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">✨ ポジ変換</div>
+            <div class="subtitle">あなたの日記を、自分を褒める言葉に</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="card">
+                <h2>📝 今日の日記を書いてみましょう</h2>
+                <textarea 
+                    id="diaryInput" 
+                    placeholder="今日あったことを、素直に書いてください。&#10;&#10;例：&#10;今日は会議でうまく話せなかった。資料も間に合わなくて焦ってしまった。でも同僚が助けてくれて、なんとか乗り切れた。&#10;&#10;※個人情報(名前、メールアドレスなど)は自動的にマスキングされます。"
+                ></textarea>
+                <div class="char-count" id="charCount">0 / 500文字</div>
+                
+                <div class="button-container">
+                    <button class="secondary" onclick="clearInput()">クリア</button>
+                    <button id="convertButton" onclick="convertDiary()">ポジティブに変換する</button>
+                </div>
+
+                <div class="result-card" id="resultCard">
+                    <div class="result-label">✨ あなたへのメッセージ</div>
+                    <div class="result-text" id="resultText"></div>
+                    <button class="copy-button" onclick="copyResult()">📋 コピーする</button>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>🔒 プライバシーについて</h3>
+                <ul>
+                    <li>あなたの日記は一切外部に送信されません</li>
+                    <li>すべての処理はスマホ・PC内で完結します</li>
+                    <li>個人情報(名前、メールなど)は自動的にマスキングされます</li>
+                    <li>オフラインでも使えます</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 ポジ変換. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 12px;">
+                <a href="https://mamekoko.example.com" target="_blank">まめここ日記アプリ</a>
+            </p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="privacy-detector.js"></script>
+    <script src="conversion-logic.js"></script>
+    <script>
+        // 文字数カウント
+        const diaryInput = document.getElementById('diaryInput');
+        const charCount = document.getElementById('charCount');
+        const maxChars = 500;
+
+        diaryInput.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = `${length} / ${maxChars}文字`;
+            
+            if (length > maxChars) {
+                charCount.style.color = '#c62828';
+            } else {
+                charCount.style.color = '';
+            }
+        });
+
+        // クリア機能
+        function clearInput() {
+            diaryInput.value = '';
+            charCount.textContent = '0 / 500文字';
+            document.getElementById('resultCard').classList.remove('show');
+        }
+
+        // 変換実行
+        function convertDiary() {
+            const text = diaryInput.value.trim();
+            
+            if (!text) {
+                showToast('日記を入力してください');
+                return;
+            }
+
+            if (text.length > maxChars) {
+                showToast('500文字以内で入力してください');
+                return;
+            }
+
+            const button = document.getElementById('convertButton');
+            button.disabled = true;
+            button.textContent = '変換中...';
+
+            // 少し遅延を入れて処理感を出す
+            setTimeout(() => {
+                try {
+                    // 1. 個人情報をマスキング
+                    const maskedText = maskPersonalInfo(text);
+                    
+                    // 2. ポジティブに変換
+                    const result = convertToPositive(maskedText);
+                    
+                    // 3. 結果を表示
+                    document.getElementById('resultText').textContent = result;
+                    document.getElementById('resultCard').classList.add('show');
+                    
+                    // 結果までスクロール
+                    document.getElementById('resultCard').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest' 
+                    });
+                    
+                } catch (error) {
+                    console.error('変換エラー:', error);
+                    showToast('変換中にエラーが発生しました');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'ポジティブに変換する';
+                }
+            }, 800);
+        }
+
+        // コピー機能
+        function copyResult() {
+            const resultText = document.getElementById('resultText').textContent;
+            
+            navigator.clipboard.writeText(resultText).then(() => {
+                showToast('コピーしました!');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        // トースト表示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Service Worker登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // Enter キーで変換（Shift+Enterは改行）
+        diaryInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                convertDiary();
+            }
+        });
+    </script>
+</body>
+</html>
